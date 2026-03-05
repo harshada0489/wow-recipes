@@ -1,4 +1,4 @@
-import { useState } from "wouter";
+import { useState } from "react";
 import Header from "@/components/layout/Header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -10,8 +10,35 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MOCK_CATEGORIES, MOCK_RECIPES } from "@/lib/mock-data";
 import { Plus, Pencil, Trash2, Image as ImageIcon } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AdminDashboard() {
+  const { toast } = useToast();
+  const [recipes, setRecipes] = useState(MOCK_RECIPES);
+  const [categories, setCategories] = useState(MOCK_CATEGORIES);
+
+  const handleDeleteRecipe = (id: string) => {
+    setRecipes(recipes.filter(r => r.id !== id));
+    toast({
+      title: "Recipe deleted",
+      description: "The recipe has been removed from the list.",
+    });
+  };
+
+  const handleDeleteCategory = (id: string) => {
+    setCategories(categories.filter(c => c.id !== id));
+    toast({
+      title: "Category deleted",
+      description: "The category has been removed.",
+    });
+  };
+
+  const handleEditClick = () => {
+    toast({
+      title: "Edit Mode",
+      description: "In the full version, this will open the form with the item's data loaded.",
+    });
+  };
   return (
     <div className="min-h-screen bg-muted/30 flex flex-col">
       <Header />
@@ -36,7 +63,7 @@ export default function AdminDashboard() {
 
           <TabsContent value="recipes" className="space-y-6">
             <div className="flex justify-between items-center bg-card p-4 rounded-xl border shadow-sm">
-              <h2 className="text-xl font-serif font-semibold">All Recipes ({MOCK_RECIPES.length})</h2>
+              <h2 className="text-xl font-serif font-semibold">All Recipes ({recipes.length})</h2>
               <Dialog>
                 <DialogTrigger asChild>
                   <Button className="gap-2" data-testid="btn-add-recipe">
@@ -131,7 +158,7 @@ export default function AdminDashboard() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {MOCK_RECIPES.map((recipe) => (
+                  {recipes.map((recipe) => (
                     <TableRow key={recipe.id}>
                       <TableCell>
                         <img src={recipe.imageUrl} alt={recipe.title} className="w-12 h-12 rounded-md object-cover" />
@@ -139,7 +166,7 @@ export default function AdminDashboard() {
                       <TableCell className="font-medium">{recipe.title}</TableCell>
                       <TableCell>
                         <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-secondary text-secondary-foreground">
-                          {MOCK_CATEGORIES.find(c => c.id === recipe.categoryId)?.name}
+                          {categories.find(c => c.id === recipe.categoryId)?.name}
                         </span>
                       </TableCell>
                       <TableCell className="text-muted-foreground text-sm">
@@ -147,10 +174,10 @@ export default function AdminDashboard() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" onClick={handleEditClick}>
                             <Pencil className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => handleDeleteRecipe(recipe.id)}>
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
@@ -164,7 +191,7 @@ export default function AdminDashboard() {
 
           <TabsContent value="categories" className="space-y-6">
             <div className="flex justify-between items-center bg-card p-4 rounded-xl border shadow-sm">
-              <h2 className="text-xl font-serif font-semibold">Categories ({MOCK_CATEGORIES.length})</h2>
+              <h2 className="text-xl font-serif font-semibold">Categories ({categories.length})</h2>
               <Dialog>
                 <DialogTrigger asChild>
                   <Button className="gap-2" data-testid="btn-add-category">
@@ -208,17 +235,17 @@ export default function AdminDashboard() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {MOCK_CATEGORIES.map((category) => (
+                  {categories.map((category) => (
                     <TableRow key={category.id}>
                       <TableCell className="font-medium">{category.name}</TableCell>
                       <TableCell className="font-mono text-sm text-muted-foreground">{category.slug}</TableCell>
                       <TableCell className="text-sm text-muted-foreground truncate max-w-[200px]">{category.description}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" onClick={handleEditClick}>
                             <Pencil className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => handleDeleteCategory(category.id)}>
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
