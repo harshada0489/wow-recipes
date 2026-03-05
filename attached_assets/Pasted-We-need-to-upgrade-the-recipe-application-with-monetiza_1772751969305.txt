@@ -1,0 +1,24 @@
+We need to upgrade the recipe application with monetization and community features. Please update the full-stack Next.js app, Prisma schema, and Admin Dashboard with the following requirements:
+
+1. Database Schema Updates (Prisma):
+- AffiliateLink Model: (id, title, url, imageUrl, recipeId). A recipe can have multiple affiliate links.
+- Comment Model: (id, authorName, text, rating (Int 1-5), adminReply (Text, nullable), recipeId, createdAt, isApproved (Boolean, default false)).
+- AdPlacement Model: (id, title, scriptCode (Text), isActive (Boolean), location (String, e.g., 'sidebar', 'below-recipe')).
+- Recipe Model Update: Add a boolean field `showAds` (default: true) so the admin can disable ads on specific recipes.
+
+2. Admin Panel & Backend Updates:
+- Recipe Editor: On the "Add/Edit Recipe" page, add a section to dynamically add/remove Affiliate Links (Title, URL, and Image upload/URL) tied to that recipe. Also, add a toggle switch for "Show Sponsored Ads on this Recipe".
+- Manage Comments: Create a new dashboard page where the admin can view all user comments. The admin must be able to: Approve/Delete the comment, and type a direct response into an `adminReply` field.
+- Manage Ads: Create a new dashboard page where the admin can paste third-party Ad network scripts (like Google AdSense or Mediavine) and toggle them active/inactive.
+
+3. Frontend Public Recipe Page Updates:
+- Affiliate Section: If a recipe has associated AffiliateLinks, display them in a visually appealing "Recommended Equipment/Ingredients" grid with the image and a "Buy Now" button.
+- Comments & Ratings UI: At the bottom of the recipe, add a form for users to leave their Name, a 1-5 Star Rating, and a Comment. 
+- Display Comments: Render the approved comments below the form. Show the user's star rating. If the `adminReply` field is populated, display the admin's reply styled distinctly (e.g., nested and highlighted with "Admin Reply" or "Author's Response").
+- Ad Rendering: Safely inject the active `AdPlacement` scripts into the recipe page layout, but ONLY if the recipe's `showAds` field is true.
+
+4. Execution Steps:
+- Step 1: Update the Prisma schema with the new models and relations, then push the database changes.
+- Step 2: Build backend API routes to handle comment submissions, ad fetching, and affiliate link management.
+- Step 3: Update the protected Admin dashboard with the new "Manage Comments", "Manage Ads", and upgraded "Edit Recipe" interfaces.
+- Step 4: Update the public Recipe Detail page UI to beautifully render the affiliate links, the comment/rating section, and the sponsored ads.

@@ -1,7 +1,7 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertCategorySchema, insertRecipeSchema, insertLegalPageSchema } from "@shared/schema";
+import { insertCategorySchema, insertRecipeSchema, insertLegalPageSchema, insertAffiliateLinkSchema, insertCommentSchema, insertAdPlacementSchema } from "@shared/schema";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -31,6 +31,12 @@ const upload = multer({
   },
 });
 
+function requireAuth(req: Request, res: Response, next: () => void) {
+  const userId = (req as any).session?.userId;
+  if (!userId) return res.status(401).json({ message: "Not authenticated" });
+  next();
+}
+
 export async function registerRoutes(
   httpServer: Server,
   app: Express
@@ -39,7 +45,6 @@ export async function registerRoutes(
 
   app.use("/uploads", (await import("express")).default.static(uploadDir));
 
-  // Auth
   app.post("/api/auth/login", async (req: Request, res: Response) => {
     const { username, password } = req.body;
     if (!username || !password) {
@@ -67,7 +72,6 @@ export async function registerRoutes(
     return res.json({ id: user.id, username: user.username });
   });
 
-  // Categories
   app.get("/api/categories", async (_req: Request, res: Response) => {
     const cats = await storage.getCategories();
     return res.json(cats);
@@ -97,7 +101,6 @@ export async function registerRoutes(
     return res.json({ message: "Deleted" });
   });
 
-  // Recipes
   app.get("/api/recipes", async (_req: Request, res: Response) => {
     const allRecipes = await storage.getRecipes();
     return res.json(allRecipes);
@@ -110,8 +113,8 @@ export async function registerRoutes(
   });
 
   app.get("/api/recipes/category/:categoryId", async (req: Request, res: Response) => {
-    const recipes = await storage.getRecipesByCategory(req.params.categoryId);
-    return res.json(recipes);
+    const r = await storage.getRecipesByCategory(req.params.categoryId);
+    return res.json(r);
   });
 
   app.post("/api/recipes", async (req: Request, res: Response) => {
@@ -132,14 +135,12 @@ export async function registerRoutes(
     return res.json({ message: "Deleted" });
   });
 
-  // Image Upload
   app.post("/api/upload", upload.single("image"), (req: Request, res: Response) => {
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
     const url = `/uploads/${req.file.filename}`;
     return res.json({ url });
   });
 
-  // Legal Pages
   app.get("/api/pages", async (_req: Request, res: Response) => {
     const pages = await storage.getLegalPages();
     return res.json(pages);
@@ -172,6 +173,101 @@ export async function registerRoutes(
 
   app.delete("/api/pages/:id", async (req: Request, res: Response) => {
     await storage.deleteLegalPage(req.params.id);
+    return res.json({ message: "Deleted" });
+  });
+
+  // Affiliate Links
+  app.get("/api/affiliate-links", async (_req: Request, res: Response) => {
+    const links = await storage.getAllAffiliateLinks();
+    return res.json(links);
+  });
+
+  app.get("/api/affiliate-links/recipe/:recipeId", async (req: Request, res: Response) => {
+    const links = await storage.getAffiliateLinksByRecipe(req.params.recipeId);
+    return res.json(links);
+  });
+
+  app.post("/api/affiliate-links", requireAuth, async (req: Request, res: Response) => {
+    const parsed = insertAffiliateLinkSchema.safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ message: "Invalid data", errors: parsed.error.flatten() });
+    const link = await storage.createAffiliateLink(parsed.data);
+    return res.status(201).json(link);
+  });
+
+  app.patch("/api/affiliate-links/:id", requireAuth, async (req: Request, res: Response) => {
+    const updated = await storage.updateAffiliateLink(req.params.id, req.body);
+    if (!updated) return res.status(404).json({ message: "Not found" });
+    return res.json(updated);
+  });
+
+  app.delete("/api/affiliate-links/:id", requireAuth, async (req: Request, res: Response) => {
+    await storage.deleteAffiliateLink(req.params.id);
+    return res.json({ message: "Deleted" });
+  });
+
+  // Comments
+  app.get("/api/comments", requireAuth, async (_req: Request, res: Response) => {
+    const all = await storage.getComments();
+    return res.json(all);
+  });
+
+  app.get("/api/comments/recipe/:recipeId", async (req: Request, res: Response) => {
+    const all = await storage.getApprovedCommentsByRecipe(req.params.recipeId);
+    return res.json(all);
+  });
+
+  app.post("/api/comments", async (req: Request, res: Response) => {
+    const parsed = insertCommentSchema.safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ message: "Invalid data", errors: parsed.error.flatten() });
+    const comment = await storage.createComment(parsed.data);
+    return res.status(201).json(comment);
+  });
+
+  app.patch("/api/comments/:id/approve", requireAuth, async (req: Request, res: Response) => {
+    const updated = await storage.approveComment(req.params.id);
+    if (!updated) return res.status(404).json({ message: "Not found" });
+    return res.json(updated);
+  });
+
+  app.patch("/api/comments/:id/reply", requireAuth, async (req: Request, res: Response) => {
+    const { adminReply } = req.body;
+    if (!adminReply) return res.status(400).json({ message: "adminReply required" });
+    const updated = await storage.replyToComment(req.params.id, adminReply);
+    if (!updated) return res.status(404).json({ message: "Not found" });
+    return res.json(updated);
+  });
+
+  app.delete("/api/comments/:id", requireAuth, async (req: Request, res: Response) => {
+    await storage.deleteComment(req.params.id);
+    return res.json({ message: "Deleted" });
+  });
+
+  // Ad Placements
+  app.get("/api/ad-placements", async (_req: Request, res: Response) => {
+    const ads = await storage.getAdPlacements();
+    return res.json(ads);
+  });
+
+  app.get("/api/ad-placements/active", async (_req: Request, res: Response) => {
+    const ads = await storage.getActiveAdPlacements();
+    return res.json(ads);
+  });
+
+  app.post("/api/ad-placements", requireAuth, async (req: Request, res: Response) => {
+    const parsed = insertAdPlacementSchema.safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ message: "Invalid data", errors: parsed.error.flatten() });
+    const ad = await storage.createAdPlacement(parsed.data);
+    return res.status(201).json(ad);
+  });
+
+  app.patch("/api/ad-placements/:id", requireAuth, async (req: Request, res: Response) => {
+    const updated = await storage.updateAdPlacement(req.params.id, req.body);
+    if (!updated) return res.status(404).json({ message: "Not found" });
+    return res.json(updated);
+  });
+
+  app.delete("/api/ad-placements/:id", requireAuth, async (req: Request, res: Response) => {
+    await storage.deleteAdPlacement(req.params.id);
     return res.json({ message: "Deleted" });
   });
 

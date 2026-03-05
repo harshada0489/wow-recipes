@@ -3,10 +3,14 @@ import {
   type Category, type InsertCategory,
   type Recipe, type InsertRecipe,
   type LegalPage, type InsertLegalPage,
+  type AffiliateLink, type InsertAffiliateLink,
+  type Comment, type InsertComment,
+  type AdPlacement, type InsertAdPlacement,
   users, categories, recipes, legalPages,
+  affiliateLinks, comments, adPlacements,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -33,6 +37,26 @@ export interface IStorage {
   createLegalPage(page: InsertLegalPage): Promise<LegalPage>;
   updateLegalPage(id: string, page: Partial<InsertLegalPage>): Promise<LegalPage | undefined>;
   deleteLegalPage(id: string): Promise<void>;
+
+  getAffiliateLinksByRecipe(recipeId: string): Promise<AffiliateLink[]>;
+  getAllAffiliateLinks(): Promise<AffiliateLink[]>;
+  createAffiliateLink(link: InsertAffiliateLink): Promise<AffiliateLink>;
+  updateAffiliateLink(id: string, link: Partial<InsertAffiliateLink>): Promise<AffiliateLink | undefined>;
+  deleteAffiliateLink(id: string): Promise<void>;
+  deleteAffiliateLinksByRecipe(recipeId: string): Promise<void>;
+
+  getComments(): Promise<Comment[]>;
+  getApprovedCommentsByRecipe(recipeId: string): Promise<Comment[]>;
+  createComment(comment: InsertComment): Promise<Comment>;
+  approveComment(id: string): Promise<Comment | undefined>;
+  replyToComment(id: string, adminReply: string): Promise<Comment | undefined>;
+  deleteComment(id: string): Promise<void>;
+
+  getAdPlacements(): Promise<AdPlacement[]>;
+  getActiveAdPlacements(): Promise<AdPlacement[]>;
+  createAdPlacement(ad: InsertAdPlacement): Promise<AdPlacement>;
+  updateAdPlacement(id: string, ad: Partial<InsertAdPlacement>): Promise<AdPlacement | undefined>;
+  deleteAdPlacement(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -103,6 +127,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteRecipe(id: string): Promise<void> {
+    await db.delete(affiliateLinks).where(eq(affiliateLinks.recipeId, id));
+    await db.delete(comments).where(eq(comments.recipeId, id));
     await db.delete(recipes).where(eq(recipes.id, id));
   }
 
@@ -132,6 +158,83 @@ export class DatabaseStorage implements IStorage {
 
   async deleteLegalPage(id: string): Promise<void> {
     await db.delete(legalPages).where(eq(legalPages.id, id));
+  }
+
+  async getAffiliateLinksByRecipe(recipeId: string): Promise<AffiliateLink[]> {
+    return db.select().from(affiliateLinks).where(eq(affiliateLinks.recipeId, recipeId));
+  }
+
+  async getAllAffiliateLinks(): Promise<AffiliateLink[]> {
+    return db.select().from(affiliateLinks);
+  }
+
+  async createAffiliateLink(link: InsertAffiliateLink): Promise<AffiliateLink> {
+    const [created] = await db.insert(affiliateLinks).values(link).returning();
+    return created;
+  }
+
+  async updateAffiliateLink(id: string, link: Partial<InsertAffiliateLink>): Promise<AffiliateLink | undefined> {
+    const [updated] = await db.update(affiliateLinks).set(link).where(eq(affiliateLinks.id, id)).returning();
+    return updated;
+  }
+
+  async deleteAffiliateLink(id: string): Promise<void> {
+    await db.delete(affiliateLinks).where(eq(affiliateLinks.id, id));
+  }
+
+  async deleteAffiliateLinksByRecipe(recipeId: string): Promise<void> {
+    await db.delete(affiliateLinks).where(eq(affiliateLinks.recipeId, recipeId));
+  }
+
+  async getComments(): Promise<Comment[]> {
+    return db.select().from(comments).orderBy(desc(comments.createdAt));
+  }
+
+  async getApprovedCommentsByRecipe(recipeId: string): Promise<Comment[]> {
+    return db.select().from(comments)
+      .where(and(eq(comments.recipeId, recipeId), eq(comments.isApproved, true)))
+      .orderBy(desc(comments.createdAt));
+  }
+
+  async createComment(comment: InsertComment): Promise<Comment> {
+    const [created] = await db.insert(comments).values(comment).returning();
+    return created;
+  }
+
+  async approveComment(id: string): Promise<Comment | undefined> {
+    const [updated] = await db.update(comments).set({ isApproved: true }).where(eq(comments.id, id)).returning();
+    return updated;
+  }
+
+  async replyToComment(id: string, adminReply: string): Promise<Comment | undefined> {
+    const [updated] = await db.update(comments).set({ adminReply }).where(eq(comments.id, id)).returning();
+    return updated;
+  }
+
+  async deleteComment(id: string): Promise<void> {
+    await db.delete(comments).where(eq(comments.id, id));
+  }
+
+  async getAdPlacements(): Promise<AdPlacement[]> {
+    return db.select().from(adPlacements);
+  }
+
+  async getActiveAdPlacements(): Promise<AdPlacement[]> {
+    return db.select().from(adPlacements).where(eq(adPlacements.isActive, true));
+  }
+
+  async createAdPlacement(ad: InsertAdPlacement): Promise<AdPlacement> {
+    const [created] = await db.insert(adPlacements).values(ad).returning();
+    return created;
+  }
+
+  async updateAdPlacement(id: string, ad: Partial<InsertAdPlacement>): Promise<AdPlacement | undefined> {
+    const [updated] = await db.update(adPlacements).set(ad).where(eq(adPlacements.id, id)).returning();
+    return updated;
+  }
+
+  async deleteAdPlacement(id: string): Promise<void> {
+    await db.delete(adPlacements).where(eq(adPlacements.id, id));
   }
 }
 
