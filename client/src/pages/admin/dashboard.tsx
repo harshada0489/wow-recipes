@@ -180,7 +180,12 @@ function RecipesTab({ recipes, categories, loading }: { recipes: Recipe[]; categ
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/recipes"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/affiliate-links"] });
+      queryClient.invalidateQueries({
+        predicate: (query) => {
+          const key = query.queryKey[0];
+          return typeof key === "string" && key.startsWith("/api/affiliate-links");
+        },
+      });
       toast({ title: editId ? "Recipe updated" : "Recipe created" });
       setIsOpen(false); resetForm();
     },

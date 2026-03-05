@@ -30,15 +30,18 @@ export default function RecipeDetail() {
   const { data: affiliateLinks = [] } = useQuery<AffiliateLink[]>({
     queryKey: [`/api/affiliate-links/recipe/${id}`],
     enabled: !!id,
+    staleTime: 0,
   });
 
   const { data: comments = [] } = useQuery<Comment[]>({
     queryKey: [`/api/comments/recipe/${id}`],
     enabled: !!id,
+    staleTime: 0,
   });
 
   const { data: activeAds = [] } = useQuery<AdPlacement[]>({
     queryKey: ["/api/ad-placements/active"],
+    staleTime: 0,
   });
 
   if (isLoading) {
