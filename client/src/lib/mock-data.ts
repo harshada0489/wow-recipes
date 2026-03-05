@@ -24,6 +24,38 @@ export type Recipe = {
   servings: number;
 };
 
+export type LegalPage = {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+  updatedAt: string;
+};
+
+export const MOCK_PAGES: LegalPage[] = [
+  {
+    id: 'p1',
+    title: 'Privacy Policy',
+    slug: 'privacy-policy',
+    content: 'At Wow Recipes, your privacy is extremely important to us. This Privacy Policy outlines the types of personal information that is received and collected by Wow Recipes and how it is used.\n\nWe may use your personal information to provide you with a better user experience, including customizing the content and advertising you see. We will never sell your personal data to third parties.\n\nIf you require any more information or have any questions about our privacy policy, please feel free to contact us by email.',
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'p2',
+    title: 'Terms of Service',
+    slug: 'terms-of-service',
+    content: 'Welcome to Wow Recipes! By accessing this website, we assume you accept these terms and conditions in full. Do not continue to use Wow Recipes\'s website if you do not accept all of the terms and conditions stated on this page.\n\nThe following terminology applies to these Terms and Conditions, Privacy Statement and Disclaimer Notice and any or all Agreements: "Client", "You" and "Your" refers to you, the person accessing this website and accepting the Company\'s terms and conditions.\n\nAll content provided on this website is for informational purposes only. The owner of this blog makes no representations as to the accuracy or completeness of any information on this site or found by following any link on this site.',
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'p3',
+    title: 'About Us',
+    slug: 'about-us',
+    content: 'Wow Recipes was born out of a profound love for bringing people together through delicious, accessible, and beautiful food. Our test kitchen is dedicated to creating recipes that work every single time.\n\nWhether you are a seasoned chef or a complete beginner, our step-by-step guides are designed to help you create culinary magic in your own kitchen.\n\nWe believe that cooking should be an enjoyable experience, not a chore. Thank you for joining us on this delicious journey!',
+    updatedAt: new Date().toISOString()
+  }
+];
+
 export const MOCK_CATEGORIES: Category[] = [
   { id: '1', name: 'Dinners', slug: 'dinners', description: 'Hearty evening meals' },
   { id: '2', name: 'Healthy', slug: 'healthy', description: 'Nutritious and delicious' },

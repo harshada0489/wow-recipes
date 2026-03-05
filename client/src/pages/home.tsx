@@ -4,6 +4,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge";
 import { Clock, Users } from "lucide-react";
 import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 
 export default function Home() {
   return (
@@ -98,12 +99,7 @@ export default function Home() {
         </section>
       </main>
       
-      <footer className="bg-card border-t py-12 mt-auto">
-        <div className="container mx-auto px-4 text-center">
-          <p className="font-serif text-xl font-bold text-primary mb-4">Wow Recipes</p>
-          <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} Wow Recipes. All rights reserved.</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

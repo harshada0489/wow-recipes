@@ -1,0 +1,31 @@
+Let's add a professional footer and a dynamic system to handle legal and informational pages (like Privacy Policy, Terms of Service, and About Us). 
+
+Please implement the following requirements:
+
+1. Database Schema Update (Prisma):
+- Add a new model called `LegalPage` with the following fields: (id, title, slug, content (Text), updatedAt). 
+
+2. Admin Panel Updates:
+- Add a new section to the Admin Dashboard called "Manage Pages".
+- Create an interface where the admin can create, edit, and delete these pages. 
+- The form should include fields for the Page Title, a unique Slug (e.g., 'privacy-policy'), and a large textarea for the Content.
+- Seed the database with three default pages: "Privacy Policy", "Terms of Service", and "About Us" with some basic placeholder text.
+
+3. Frontend Public Routes:
+- Create a dynamic route at `/page/[slug]` (or similar) that fetches the `LegalPage` from the database using the slug and displays the title and content in a clean, readable layout. Keep the text container narrow for easy reading.
+
+4. Footer Design & UI:
+- Create a responsive `<Footer />` component and place it at the bottom of the main layout so it appears on all public pages.
+- Use a clean, modern design with Tailwind CSS (either a dark background with light text, or a soft neutral background).
+- Divide the footer into 3 columns:
+  - Column 1: Website Name/Logo and a short "About" blurb.
+  - Column 2: Quick Links (Home, All Recipes, Categories).
+  - Column 3: Legal & Info (Links to /page/privacy-policy, /page/terms-of-service, /page/about-us).
+- Add a bottom bar spanning the full width with a copyright notice: "© {Current Year} {Website Name}. All rights reserved."
+
+5. Execution:
+- Step 1: Update the Prisma schema and push the database changes.
+- Step 2: Build the backend API routes for managing the pages.
+- Step 3: Build the Admin UI to edit the pages.
+- Step 4: Build the dynamic public route for displaying the pages.
+- Step 5: Build and implement the Footer component across the site.

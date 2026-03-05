@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MOCK_CATEGORIES, MOCK_RECIPES } from "@/lib/mock-data";
+import { MOCK_CATEGORIES, MOCK_RECIPES, MOCK_PAGES } from "@/lib/mock-data";
 import { Plus, Pencil, Trash2, Image as ImageIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -16,6 +16,7 @@ export default function AdminDashboard() {
   const { toast } = useToast();
   const [recipes, setRecipes] = useState(MOCK_RECIPES);
   const [categories, setCategories] = useState(MOCK_CATEGORIES);
+  const [pages, setPages] = useState(MOCK_PAGES);
 
   const handleDeleteRecipe = (id: string) => {
     setRecipes(recipes.filter(r => r.id !== id));
@@ -33,6 +34,14 @@ export default function AdminDashboard() {
     });
   };
 
+  const handleDeletePage = (id: string) => {
+    setPages(pages.filter(p => p.id !== id));
+    toast({
+      title: "Page deleted",
+      description: "The page has been removed.",
+    });
+  };
+
   const handleEditClick = () => {
     toast({
       title: "Edit Mode",
@@ -41,6 +50,7 @@ export default function AdminDashboard() {
   };
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
   const [isRecipeDialogOpen, setIsRecipeDialogOpen] = useState(false);
+  const [isPageDialogOpen, setIsPageDialogOpen] = useState(false);
 
   const handleSaveRecipe = () => {
     toast({
@@ -56,6 +66,14 @@ export default function AdminDashboard() {
       description: "In the full version, this will be saved to the database.",
     });
     setIsCategoryDialogOpen(false);
+  };
+
+  const handleSavePage = () => {
+    toast({
+      title: "Page saved",
+      description: "In the full version, this will be saved to the database.",
+    });
+    setIsPageDialogOpen(false);
   };
 
   return (
@@ -77,6 +95,9 @@ export default function AdminDashboard() {
             </TabsTrigger>
             <TabsTrigger value="categories" className="px-6 py-2.5 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-medium">
               Manage Categories
+            </TabsTrigger>
+            <TabsTrigger value="pages" className="px-6 py-2.5 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-medium">
+              Manage Pages
             </TabsTrigger>
           </TabsList>
 
@@ -265,6 +286,76 @@ export default function AdminDashboard() {
                             <Pencil className="h-4 w-4" />
                           </Button>
                           <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => handleDeleteCategory(category.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="pages" className="space-y-6">
+            <div className="flex justify-between items-center bg-card p-4 rounded-xl border shadow-sm">
+              <h2 className="text-xl font-serif font-semibold">Pages ({pages.length})</h2>
+              <Dialog open={isPageDialogOpen} onOpenChange={setIsPageDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="gap-2" data-testid="btn-add-page">
+                    <Plus className="w-4 h-4" /> Add Page
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle>Add Page</DialogTitle>
+                    <DialogDescription>Create a new informational page for your website.</DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="page-title">Page Title</Label>
+                        <Input id="page-title" placeholder="E.g., Privacy Policy" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="page-slug">Slug</Label>
+                        <Input id="page-slug" placeholder="privacy-policy" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="page-content">Content</Label>
+                      <Textarea id="page-content" placeholder="Enter the page content here..." className="resize-none min-h-[200px]" />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button onClick={handleSavePage}>Save Page</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
+
+            <div className="bg-card rounded-xl border shadow-sm overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Title</TableHead>
+                    <TableHead>Slug</TableHead>
+                    <TableHead>Last Updated</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {pages.map((page) => (
+                    <TableRow key={page.id}>
+                      <TableCell className="font-medium">{page.title}</TableCell>
+                      <TableCell className="font-mono text-sm text-muted-foreground">/{page.slug}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{new Date(page.updatedAt).toLocaleDateString()}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" onClick={handleEditClick}>
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => handleDeletePage(page.id)}>
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>

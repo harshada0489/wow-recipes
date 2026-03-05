@@ -1,6 +1,7 @@
 import { useParams } from "wouter";
 import { MOCK_RECIPES, MOCK_CATEGORIES } from "@/lib/mock-data";
 import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 import { Clock, Users, ChefHat, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -117,6 +118,8 @@ export default function RecipeDetail() {
           </div>
         </div>
       </main>
+      
+      <Footer />
     </div>
   );
 }
