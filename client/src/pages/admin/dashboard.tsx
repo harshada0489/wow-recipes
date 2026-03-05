@@ -39,6 +39,25 @@ export default function AdminDashboard() {
       description: "In the full version, this will open the form with the item's data loaded.",
     });
   };
+  const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
+  const [isRecipeDialogOpen, setIsRecipeDialogOpen] = useState(false);
+
+  const handleSaveRecipe = () => {
+    toast({
+      title: "Recipe saved",
+      description: "In the full version, this will be saved to the database.",
+    });
+    setIsRecipeDialogOpen(false);
+  };
+
+  const handleSaveCategory = () => {
+    toast({
+      title: "Category saved",
+      description: "In the full version, this will be saved to the database.",
+    });
+    setIsCategoryDialogOpen(false);
+  };
+
   return (
     <div className="min-h-screen bg-muted/30 flex flex-col">
       <Header />
@@ -64,7 +83,7 @@ export default function AdminDashboard() {
           <TabsContent value="recipes" className="space-y-6">
             <div className="flex justify-between items-center bg-card p-4 rounded-xl border shadow-sm">
               <h2 className="text-xl font-serif font-semibold">All Recipes ({recipes.length})</h2>
-              <Dialog>
+              <Dialog open={isRecipeDialogOpen} onOpenChange={setIsRecipeDialogOpen}>
                 <DialogTrigger asChild>
                   <Button className="gap-2" data-testid="btn-add-recipe">
                     <Plus className="w-4 h-4" /> Add Recipe
@@ -140,7 +159,7 @@ export default function AdminDashboard() {
                   </div>
                   
                   <DialogFooter>
-                    <Button type="submit">Save Recipe</Button>
+                    <Button onClick={handleSaveRecipe}>Save Recipe</Button>
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
@@ -192,7 +211,7 @@ export default function AdminDashboard() {
           <TabsContent value="categories" className="space-y-6">
             <div className="flex justify-between items-center bg-card p-4 rounded-xl border shadow-sm">
               <h2 className="text-xl font-serif font-semibold">Categories ({categories.length})</h2>
-              <Dialog>
+              <Dialog open={isCategoryDialogOpen} onOpenChange={setIsCategoryDialogOpen}>
                 <DialogTrigger asChild>
                   <Button className="gap-2" data-testid="btn-add-category">
                     <Plus className="w-4 h-4" /> Add Category
@@ -218,7 +237,7 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button type="submit">Save Category</Button>
+                    <Button onClick={handleSaveCategory}>Save Category</Button>
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
