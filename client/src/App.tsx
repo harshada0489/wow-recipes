@@ -7,7 +7,7 @@ import NotFound from "@/pages/not-found";
 
 import Home from "@/pages/home";
 import RecipeDetail from "@/pages/recipe-detail";
-import AdminDashboard from "@/pages/admin/dashboard";
+import AdminPage from "@/pages/admin/index";
 import LegalPage from "@/pages/legal-page";
 
 function Router() {
@@ -15,9 +15,8 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/recipe/:id" component={RecipeDetail} />
-      <Route path="/admin" component={AdminDashboard} />
+      <Route path="/admin" component={AdminPage} />
       <Route path="/page/:slug" component={LegalPage} />
-      {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
   );

@@ -1,15 +1,36 @@
 import { useParams } from "wouter";
-import { MOCK_RECIPES, MOCK_CATEGORIES } from "@/lib/mock-data";
+import { useQuery } from "@tanstack/react-query";
+import { Recipe, Category } from "@/lib/mock-data";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { Clock, Users, ChefHat, CheckCircle2 } from "lucide-react";
+import { Clock, Users, ChefHat, CheckCircle2, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 
 export default function RecipeDetail() {
   const { id } = useParams<{ id: string }>();
-  const recipe = MOCK_RECIPES.find((r) => r.id === id);
+  
+  const { data: recipe, isLoading } = useQuery<Recipe>({
+    queryKey: [`/api/recipes/${id}`],
+    enabled: !!id,
+  });
+
+  const { data: categories = [] } = useQuery<Category[]>({
+    queryKey: ["/api/categories"],
+  });
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <div className="flex-1 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!recipe) {
     return (
@@ -18,18 +39,18 @@ export default function RecipeDetail() {
         <div className="flex-1 flex items-center justify-center">
           <p className="text-xl text-muted-foreground">Recipe not found.</p>
         </div>
+        <Footer />
       </div>
     );
   }
 
-  const category = MOCK_CATEGORIES.find((c) => c.id === recipe.categoryId);
+  const category = categories.find((c) => c.id === recipe.categoryId);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
 
       <main className="flex-1 container mx-auto px-4 md:px-6 py-8 md:py-12 max-w-5xl">
-        {/* Header Section */}
         <div className="text-center max-w-3xl mx-auto mb-10 space-y-4">
           {category && (
             <Badge variant="secondary" className="px-4 py-1 mb-2">
@@ -46,30 +67,30 @@ export default function RecipeDetail() {
           <div className="flex flex-wrap items-center justify-center gap-6 pt-4 text-sm font-medium text-muted-foreground">
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-primary" />
-              <span>Prep: {recipe.prepTime}</span>
+              <span>Prep: {recipe.prepTime || "N/A"}</span>
             </div>
             <div className="flex items-center gap-2">
               <ChefHat className="w-4 h-4 text-primary" />
-              <span>Cook: {recipe.cookTime}</span>
+              <span>Cook: {recipe.cookTime || "N/A"}</span>
             </div>
             <div className="flex items-center gap-2">
               <Users className="w-4 h-4 text-primary" />
-              <span>Serves: {recipe.servings}</span>
+              <span>Serves: {recipe.servings || "?"}</span>
             </div>
           </div>
         </div>
 
-        {/* Main Image */}
-        <div className="relative aspect-[21/9] md:aspect-[2/1] overflow-hidden rounded-3xl mb-16 shadow-lg">
-          <img 
-            src={recipe.imageUrl} 
-            alt={recipe.title}
-            className="object-cover w-full h-full"
-          />
-        </div>
+        {recipe.imageUrl && (
+          <div className="relative aspect-[21/9] md:aspect-[2/1] overflow-hidden rounded-3xl mb-16 shadow-lg">
+            <img 
+              src={recipe.imageUrl} 
+              alt={recipe.title}
+              className="object-cover w-full h-full"
+            />
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-12 lg:gap-20 items-start">
-          {/* Ingredients Sidebar */}
           <div className="bg-card rounded-2xl p-6 md:p-8 border shadow-sm lg:sticky lg:top-24">
             <h2 className="text-2xl font-serif font-bold mb-6 flex items-center gap-2">
               Ingredients
@@ -80,7 +101,7 @@ export default function RecipeDetail() {
                   <Checkbox id={`ingredient-${idx}`} className="mt-1" />
                   <label 
                     htmlFor={`ingredient-${idx}`}
-                    className="text-base leading-snug cursor-pointer peer-data-[state=checked]:text-muted-foreground peer-data-[state=checked]:line-through transition-all"
+                    className="text-base leading-snug cursor-pointer"
                   >
                     {ingredient}
                   </label>
@@ -89,7 +110,6 @@ export default function RecipeDetail() {
             </ul>
           </div>
 
-          {/* Instructions */}
           <div className="space-y-8">
             <h2 className="text-3xl font-serif font-bold mb-8">Instructions</h2>
             

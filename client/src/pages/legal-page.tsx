@@ -1,11 +1,29 @@
 import { useParams } from "wouter";
-import { MOCK_PAGES } from "@/lib/mock-data";
+import { useQuery } from "@tanstack/react-query";
+import { LegalPage as LegalPageType } from "@/lib/mock-data";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import { Loader2 } from "lucide-react";
 
 export default function LegalPage() {
   const { slug } = useParams<{ slug: string }>();
-  const page = MOCK_PAGES.find(p => p.slug === slug);
+  
+  const { data: page, isLoading } = useQuery<LegalPageType>({
+    queryKey: [`/api/pages/by-slug/${slug}`],
+    enabled: !!slug,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background">
+        <Header />
+        <main className="flex-1 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!page) {
     return (

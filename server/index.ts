@@ -2,6 +2,8 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
+import session from "express-session";
+import MemoryStore from "memorystore";
 
 const app = express();
 const httpServer = createServer(app);
@@ -11,6 +13,20 @@ declare module "http" {
     rawBody: unknown;
   }
 }
+
+const SessionStore = MemoryStore(session);
+
+app.use(session({
+  secret: process.env.SESSION_SECRET || "wow-recipes-secret-key-change-in-production",
+  resave: false,
+  saveUninitialized: false,
+  store: new SessionStore({ checkPeriod: 86400000 }),
+  cookie: {
+    maxAge: 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    secure: false,
+  },
+}));
 
 app.use(
   express.json({

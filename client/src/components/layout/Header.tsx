@@ -1,10 +1,10 @@
 import { Link, useLocation } from "wouter";
-import { MOCK_CATEGORIES } from "@/lib/mock-data";
+import { useQuery } from "@tanstack/react-query";
+import { Category } from "@/lib/mock-data";
 import {
   NavigationMenu,
   NavigationMenuContent,
   NavigationMenuItem,
-  NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
@@ -15,16 +15,17 @@ import { cn } from "@/lib/utils";
 
 export default function Header() {
   const [location] = useLocation();
+  const { data: categories = [] } = useQuery<Category[]>({
+    queryKey: ["/api/categories"],
+  });
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
         <div className="flex items-center gap-6">
-          <Link href="/">
-            <a className="flex items-center gap-2 font-serif text-2xl font-bold text-primary transition-colors hover:text-primary/80" data-testid="link-home">
-              <ChefHat className="h-7 w-7" />
-              <span>Wow Recipes</span>
-            </a>
+          <Link href="/" className="flex items-center gap-2 font-serif text-2xl font-bold text-primary transition-colors hover:text-primary/80" data-testid="link-home">
+            <ChefHat className="h-7 w-7" />
+            <span>Wow Recipes</span>
           </Link>
 
           <div className="hidden md:flex">
@@ -46,19 +47,19 @@ export default function Header() {
                         </div>
                       </div>
                       <div className="grid grid-cols-1 gap-2">
-                        {MOCK_CATEGORIES.map((category) => (
-                          <Link key={category.id} href={`/category/${category.slug}`}>
-                            <a
-                              className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                              data-testid={`link-category-${category.slug}`}
-                            >
-                              <div className="text-sm font-medium leading-none font-serif">{category.name}</div>
-                              {category.description && (
-                                <p className="line-clamp-2 text-xs leading-snug text-muted-foreground mt-1">
-                                  {category.description}
-                                </p>
-                              )}
-                            </a>
+                        {categories.map((category) => (
+                          <Link
+                            key={category.id}
+                            href={`/category/${category.slug}`}
+                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                            data-testid={`link-category-${category.slug}`}
+                          >
+                            <div className="text-sm font-medium leading-none font-serif">{category.name}</div>
+                            {category.description && (
+                              <p className="line-clamp-2 text-xs leading-snug text-muted-foreground mt-1">
+                                {category.description}
+                              </p>
+                            )}
                           </Link>
                         ))}
                       </div>
@@ -67,10 +68,8 @@ export default function Header() {
                 </NavigationMenuItem>
                 
                 <NavigationMenuItem>
-                  <Link href="/about">
-                    <a className={cn(navigationMenuTriggerStyle(), "bg-transparent font-medium")}>
-                      About Us
-                    </a>
+                  <Link href="/page/about-us" className={cn(navigationMenuTriggerStyle(), "bg-transparent font-medium")}>
+                    About Us
                   </Link>
                 </NavigationMenuItem>
               </NavigationMenuList>
