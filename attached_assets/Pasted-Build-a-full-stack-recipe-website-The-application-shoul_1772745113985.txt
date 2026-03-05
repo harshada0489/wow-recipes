@@ -1,0 +1,28 @@
+Build a full-stack recipe website. The application should have a responsive, modern UI and a fully functional backend with an admin panel. Please use Next.js (App Router), React, Tailwind CSS for styling, and Prisma with SQLite for the database. 
+
+Here are the specific requirements:
+
+1. Database Schema (Prisma):
+- User: For the admin account (id, username, password).
+- Category: For the recipe categories (id, name, slug).
+- Recipe: (id, title, description, ingredients, instructions, imageUrl, categoryId, createdAt).
+
+2. Frontend Design & User View:
+- Header Navigation: Create a rich, mega-menu style dropdown navigation similar to Allrecipes.com. The dropdown MUST dynamically fetch and display all "Categories" from the database. 
+- Home Page: Display a visually appealing grid of recipe cards showing the recipe image, title, and category. These should update instantly when the admin adds a new recipe.
+- Recipe Detail Page: A clean page displaying the full recipe image, ingredients list (with checkboxes if possible), and step-by-step instructions.
+
+3. Admin Panel & Backend Capabilities:
+- Create a protected /admin route. Use a simple session or JWT authentication. Seed the database with one default admin account (username: admin, password: password123).
+- Admin Dashboard: Provide a clean interface with two main management sections: "Manage Categories" and "Manage Recipes".
+- Category Management: Allow the admin to create, edit, and delete categories. (Remind the agent that adding a category here must automatically update the frontend header dropdown).
+- Recipe Management: Allow the admin to create, edit, and delete recipes. The "Add Recipe" form must include a file upload input for the recipe image. 
+- Image Handling: Implement secure image uploading. Store the uploaded images locally in the public directory and save the file path to the database so they render correctly on the frontend.
+
+4. Step-by-Step Execution:
+- Step 1: Initialize the project, set up Tailwind CSS, and configure the Prisma schema.
+- Step 2: Build the database models and a seed script for the admin user.
+- Step 3: Implement the backend API routes for categories, recipes, image uploads (using Multer or Next.js equivalent), and admin login.
+- Step 4: Build the dynamic Header with the Allrecipes-style dropdown.
+- Step 5: Build the public-facing pages (Home, Category view, Recipe view).
+- Step 6: Build the protected Admin dashboard and form submissions.
