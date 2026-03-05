@@ -23,7 +23,7 @@ export default function Header() {
           <Link href="/">
             <a className="flex items-center gap-2 font-serif text-2xl font-bold text-primary transition-colors hover:text-primary/80" data-testid="link-home">
               <ChefHat className="h-7 w-7" />
-              <span>Culinary Haven</span>
+              <span>Wow Recipes</span>
             </a>
           </Link>
 
@@ -84,12 +84,13 @@ export default function Header() {
             <span className="sr-only">Search</span>
           </Button>
           
-          <Link href="/admin">
+          {/* Admin link hidden for normal users */}
+          {/* <Link href="/admin">
             <Button variant={location.startsWith('/admin') ? "secondary" : "ghost"} size="sm" className="hidden sm:flex gap-2">
               <User className="h-4 w-4" />
               <span>Admin</span>
             </Button>
-          </Link>
+          </Link> */}
           
           <Button variant="ghost" size="icon" className="md:hidden">
             <Menu className="h-6 w-6" />

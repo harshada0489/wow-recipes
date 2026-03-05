@@ -100,8 +100,8 @@ export default function Home() {
       
       <footer className="bg-card border-t py-12 mt-auto">
         <div className="container mx-auto px-4 text-center">
-          <p className="font-serif text-xl font-bold text-primary mb-4">Culinary Haven</p>
-          <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} Culinary Haven. All rights reserved.</p>
+          <p className="font-serif text-xl font-bold text-primary mb-4">Wow Recipes</p>
+          <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} Wow Recipes. All rights reserved.</p>
         </div>
       </footer>
     </div>
