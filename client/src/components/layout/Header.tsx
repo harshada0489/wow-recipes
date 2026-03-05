@@ -84,13 +84,12 @@ export default function Header() {
             <span className="sr-only">Search</span>
           </Button>
           
-          {/* Admin link hidden for normal users */}
-          {/* <Link href="/admin">
+          <Link href="/admin">
             <Button variant={location.startsWith('/admin') ? "secondary" : "ghost"} size="sm" className="hidden sm:flex gap-2">
               <User className="h-4 w-4" />
               <span>Admin</span>
             </Button>
-          </Link> */}
+          </Link>
           
           <Button variant="ghost" size="icon" className="md:hidden">
             <Menu className="h-6 w-6" />
