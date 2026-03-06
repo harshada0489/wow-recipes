@@ -14,7 +14,6 @@ function ProtectedRoute({ component: Component }: { component: React.ComponentTy
   const { data: user, isLoading } = useQuery({
     queryKey: ["/api/auth/me"],
     retry: false,
-    staleTime: 0,
   });
 
   if (isLoading) {
@@ -40,7 +39,6 @@ export default function AdminRouter() {
   const { data: user, isLoading } = useQuery({
     queryKey: ["/api/auth/me"],
     retry: false,
-    staleTime: 0,
   });
 
   return (

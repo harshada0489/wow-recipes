@@ -20,6 +20,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const logoutMutation = useMutation({
     mutationFn: () => apiRequest("POST", "/api/auth/logout"),
     onSuccess: () => {
+      queryClient.setQueryData(["/api/auth/me"], null);
       queryClient.clear();
       setLocation("/");
     },
