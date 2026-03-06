@@ -79,25 +79,24 @@ export async function registerRoutes(
     return res.json({ id: user.id, username: user.username });
   });
 
-  app.post("/api/auth/change-password", requireAuth, async (req: Request, res: Response) => {
-    const { currentPassword, newPassword } = req.body;
-    if (!currentPassword || !newPassword) {
-      return res.status(400).json({ message: "Current password and new password are required" });
+  app.post("/api/auth/change-password", async (req: Request, res: Response) => {
+    const { currentPassword, newPassword, username } = req.body;
+    if (!currentPassword || !newPassword || !username) {
+      return res.status(400).json({ message: "Username, current password, and new password are required" });
     }
     if (newPassword.length < 8) {
       return res.status(400).json({ message: "New password must be at least 8 characters" });
     }
-    const userId = (req as any).session.userId;
-    const user = await storage.getUser(userId);
+    const user = await storage.getUserByUsername(username);
     if (!user) {
-      return res.status(401).json({ message: "Not authenticated" });
+      return res.status(401).json({ message: "User not found" });
     }
     const valid = await bcrypt.compare(currentPassword, user.password);
     if (!valid) {
       return res.status(400).json({ message: "Current password is incorrect" });
     }
     const hashedPassword = await bcrypt.hash(newPassword, 12);
-    await storage.updateUserPassword(userId, hashedPassword);
+    await storage.updateUserPassword(user.id, hashedPassword);
     return res.json({ message: "Password updated successfully" });
   });
 

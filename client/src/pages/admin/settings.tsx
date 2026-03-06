@@ -1,18 +1,64 @@
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Shield } from "lucide-react";
+import { Loader2, Shield, Eye, EyeOff } from "lucide-react";
+
+function PasswordInput({
+  id,
+  value,
+  onChange,
+  placeholder,
+  testId,
+}: {
+  id: string;
+  value: string;
+  onChange: (val: string) => void;
+  placeholder: string;
+  testId: string;
+}) {
+  const [visible, setVisible] = useState(false);
+  return (
+    <div className="relative">
+      <Input
+        id={id}
+        type={visible ? "text" : "password"}
+        data-testid={testId}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        required
+        className="pr-10"
+      />
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        className="absolute right-0 top-0 h-full w-10 text-muted-foreground hover:text-foreground"
+        onClick={() => setVisible(!visible)}
+        tabIndex={-1}
+        data-testid={`${testId}-toggle`}
+      >
+        {visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+      </Button>
+    </div>
+  );
+}
 
 export default function AdminSettings() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const { toast } = useToast();
+
+  const { data: user } = useQuery<{ id: string; username: string }>({
+    queryKey: ["/api/auth/me"],
+    retry: false,
+  });
 
   const changePasswordMutation = useMutation({
     mutationFn: async () => {
@@ -23,6 +69,7 @@ export default function AdminSettings() {
         throw new Error("New password must be at least 8 characters");
       }
       const res = await apiRequest("POST", "/api/auth/change-password", {
+        username: user?.username || "admin",
         currentPassword,
         newPassword,
       });
@@ -73,38 +120,32 @@ export default function AdminSettings() {
             >
               <div className="space-y-2">
                 <Label htmlFor="currentPassword">Current Password</Label>
-                <Input
+                <PasswordInput
                   id="currentPassword"
-                  type="password"
-                  data-testid="input-current-password"
                   value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  onChange={setCurrentPassword}
                   placeholder="Enter current password"
-                  required
+                  testId="input-current-password"
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="newPassword">New Password</Label>
-                <Input
+                <PasswordInput
                   id="newPassword"
-                  type="password"
-                  data-testid="input-new-password"
                   value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
+                  onChange={setNewPassword}
                   placeholder="Enter new password (min 8 characters)"
-                  required
+                  testId="input-new-password"
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                <Input
+                <PasswordInput
                   id="confirmPassword"
-                  type="password"
-                  data-testid="input-confirm-password"
                   value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  onChange={setConfirmPassword}
                   placeholder="Re-enter new password"
-                  required
+                  testId="input-confirm-password"
                 />
               </div>
               <Button
