@@ -6,7 +6,7 @@ A full-stack recipe website with an admin panel for managing recipes, categories
 
 - **Frontend**: React + Vite + Tailwind CSS v4 + shadcn/ui components
 - **Backend**: Express.js REST API
-- **Database**: PostgreSQL with Drizzle ORM
+- **Database**: MySQL/MariaDB with Drizzle ORM
 - **Routing**: wouter (frontend), Express (backend)
 - **State**: TanStack React Query for server state (staleTime: Infinity, always invalidate after mutations)
 - **Auth**: Session-based with express-session + memorystore, bcryptjs for password hashing
@@ -32,7 +32,7 @@ A full-stack recipe website with an admin panel for managing recipes, categories
 
 - `users` - Admin accounts (password stored as bcrypt hash)
 - `categories` - Recipe categories (name, slug, description)
-- `recipes` - Recipes (title, description, ingredients[], instructions[], imageUrl, categoryId, prepTime, cookTime, servings, showAds)
+- `recipes` - Recipes (title, description, ingredients JSON, instructions JSON, imageUrl, categoryId, prepTime, cookTime, servings, showAds)
 - `legal_pages` - Legal/info pages (title, slug, content)
 - `affiliate_links` - Product recommendations tied to recipes (title, url, imageUrl, recipeId)
 - `comments` - User reviews with ratings (authorName, text, rating 1-5, adminReply, recipeId, isApproved, createdAt)

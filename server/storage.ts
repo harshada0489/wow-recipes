@@ -11,6 +11,11 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
+import crypto from "crypto";
+
+function generateId(): string {
+  return crypto.randomUUID();
+}
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -72,7 +77,9 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db.insert(users).values(insertUser).returning();
+    const id = generateId();
+    await db.insert(users).values({ ...insertUser, id });
+    const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;
   }
 
@@ -95,12 +102,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createCategory(cat: InsertCategory): Promise<Category> {
-    const [created] = await db.insert(categories).values(cat).returning();
+    const id = generateId();
+    await db.insert(categories).values({ ...cat, id });
+    const [created] = await db.select().from(categories).where(eq(categories.id, id));
     return created;
   }
 
   async updateCategory(id: string, cat: Partial<InsertCategory>): Promise<Category | undefined> {
-    const [updated] = await db.update(categories).set(cat).where(eq(categories.id, id)).returning();
+    await db.update(categories).set(cat).where(eq(categories.id, id));
+    const [updated] = await db.select().from(categories).where(eq(categories.id, id));
     return updated;
   }
 
@@ -122,12 +132,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createRecipe(recipe: InsertRecipe): Promise<Recipe> {
-    const [created] = await db.insert(recipes).values(recipe).returning();
+    const id = generateId();
+    await db.insert(recipes).values({ ...recipe, id });
+    const [created] = await db.select().from(recipes).where(eq(recipes.id, id));
     return created;
   }
 
   async updateRecipe(id: string, recipe: Partial<InsertRecipe>): Promise<Recipe | undefined> {
-    const [updated] = await db.update(recipes).set(recipe).where(eq(recipes.id, id)).returning();
+    await db.update(recipes).set(recipe).where(eq(recipes.id, id));
+    const [updated] = await db.select().from(recipes).where(eq(recipes.id, id));
     return updated;
   }
 
@@ -152,12 +165,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createLegalPage(page: InsertLegalPage): Promise<LegalPage> {
-    const [created] = await db.insert(legalPages).values(page).returning();
+    const id = generateId();
+    await db.insert(legalPages).values({ ...page, id });
+    const [created] = await db.select().from(legalPages).where(eq(legalPages.id, id));
     return created;
   }
 
   async updateLegalPage(id: string, page: Partial<InsertLegalPage>): Promise<LegalPage | undefined> {
-    const [updated] = await db.update(legalPages).set({ ...page, updatedAt: new Date() }).where(eq(legalPages.id, id)).returning();
+    await db.update(legalPages).set({ ...page, updatedAt: new Date() }).where(eq(legalPages.id, id));
+    const [updated] = await db.select().from(legalPages).where(eq(legalPages.id, id));
     return updated;
   }
 
@@ -174,12 +190,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createAffiliateLink(link: InsertAffiliateLink): Promise<AffiliateLink> {
-    const [created] = await db.insert(affiliateLinks).values(link).returning();
+    const id = generateId();
+    await db.insert(affiliateLinks).values({ ...link, id });
+    const [created] = await db.select().from(affiliateLinks).where(eq(affiliateLinks.id, id));
     return created;
   }
 
   async updateAffiliateLink(id: string, link: Partial<InsertAffiliateLink>): Promise<AffiliateLink | undefined> {
-    const [updated] = await db.update(affiliateLinks).set(link).where(eq(affiliateLinks.id, id)).returning();
+    await db.update(affiliateLinks).set(link).where(eq(affiliateLinks.id, id));
+    const [updated] = await db.select().from(affiliateLinks).where(eq(affiliateLinks.id, id));
     return updated;
   }
 
@@ -202,17 +221,21 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createComment(comment: InsertComment): Promise<Comment> {
-    const [created] = await db.insert(comments).values(comment).returning();
+    const id = generateId();
+    await db.insert(comments).values({ ...comment, id });
+    const [created] = await db.select().from(comments).where(eq(comments.id, id));
     return created;
   }
 
   async approveComment(id: string): Promise<Comment | undefined> {
-    const [updated] = await db.update(comments).set({ isApproved: true }).where(eq(comments.id, id)).returning();
+    await db.update(comments).set({ isApproved: true }).where(eq(comments.id, id));
+    const [updated] = await db.select().from(comments).where(eq(comments.id, id));
     return updated;
   }
 
   async replyToComment(id: string, adminReply: string): Promise<Comment | undefined> {
-    const [updated] = await db.update(comments).set({ adminReply }).where(eq(comments.id, id)).returning();
+    await db.update(comments).set({ adminReply }).where(eq(comments.id, id));
+    const [updated] = await db.select().from(comments).where(eq(comments.id, id));
     return updated;
   }
 
@@ -229,12 +252,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createAdPlacement(ad: InsertAdPlacement): Promise<AdPlacement> {
-    const [created] = await db.insert(adPlacements).values(ad).returning();
+    const id = generateId();
+    await db.insert(adPlacements).values({ ...ad, id });
+    const [created] = await db.select().from(adPlacements).where(eq(adPlacements.id, id));
     return created;
   }
 
   async updateAdPlacement(id: string, ad: Partial<InsertAdPlacement>): Promise<AdPlacement | undefined> {
-    const [updated] = await db.update(adPlacements).set(ad).where(eq(adPlacements.id, id)).returning();
+    await db.update(adPlacements).set(ad).where(eq(adPlacements.id, id));
+    const [updated] = await db.select().from(adPlacements).where(eq(adPlacements.id, id));
     return updated;
   }
 
