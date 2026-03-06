@@ -1,18 +1,21 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { queryClient } from "@/lib/queryClient";
+import { Route, Switch, useLocation, Redirect } from "wouter";
+import { Loader2 } from "lucide-react";
 import AdminLogin from "./login";
 import AdminDashboard from "./dashboard";
-import { Loader2 } from "lucide-react";
+import AdminCategories from "./categories";
+import AdminPages from "./pages-admin";
+import AdminComments from "./comments";
+import AdminAds from "./ads";
+import AdminSettings from "./settings";
+import AdminLayout from "@/components/layout/AdminLayout";
 
-export default function AdminPage() {
+function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
   const { data: user, isLoading } = useQuery({
     queryKey: ["/api/auth/me"],
     retry: false,
     staleTime: 0,
   });
-
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   if (isLoading) {
     return (
@@ -22,23 +25,59 @@ export default function AdminPage() {
     );
   }
 
-  if (!user && isAuthenticated !== true) {
-    return (
-      <AdminLogin
-        onLogin={() => {
-          setIsAuthenticated(true);
-          queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
-        }}
-      />
-    );
+  if (!user) {
+    return <Redirect to="/admin" />;
   }
 
   return (
-    <AdminDashboard
-      onLogout={() => {
-        setIsAuthenticated(false);
-        queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
-      }}
-    />
+    <AdminLayout>
+      <Component />
+    </AdminLayout>
+  );
+}
+
+export default function AdminRouter() {
+  const { data: user, isLoading } = useQuery({
+    queryKey: ["/api/auth/me"],
+    retry: false,
+    staleTime: 0,
+  });
+
+  return (
+    <Switch>
+      <Route path="/admin">
+        {() => {
+          if (isLoading) {
+            return (
+              <div className="min-h-screen flex items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+              </div>
+            );
+          }
+          if (user) {
+            return <Redirect to="/admin/dashboard" />;
+          }
+          return <AdminLogin />;
+        }}
+      </Route>
+      <Route path="/admin/dashboard">
+        <ProtectedRoute component={AdminDashboard} />
+      </Route>
+      <Route path="/admin/categories">
+        <ProtectedRoute component={AdminCategories} />
+      </Route>
+      <Route path="/admin/pages">
+        <ProtectedRoute component={AdminPages} />
+      </Route>
+      <Route path="/admin/comments">
+        <ProtectedRoute component={AdminComments} />
+      </Route>
+      <Route path="/admin/ads">
+        <ProtectedRoute component={AdminAds} />
+      </Route>
+      <Route path="/admin/settings">
+        <ProtectedRoute component={AdminSettings} />
+      </Route>
+    </Switch>
   );
 }

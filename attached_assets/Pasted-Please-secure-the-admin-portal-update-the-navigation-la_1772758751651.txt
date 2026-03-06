@@ -1,0 +1,32 @@
+Please secure the admin portal, update the navigation layout, implement secure password hashing, and add an Admin Settings page for password management. 
+
+Implement the following requirements:
+
+1. Secure Admin Seeding & Authentication (bcryptjs):
+- Install the `bcryptjs` package and its TypeScript types.
+- Update the database seed script. Instead of saving a plain-text password, use `bcryptjs` to hash a strong default password (e.g., 'SecureAdmin2026!') before saving the Admin user to the database.
+- In the login API route, use `bcrypt.compare` to verify the entered password against the hashed password in the database.
+- Ensure there is NO public "Register" or "Sign Up" page. The system must strictly only authenticate the seeded admin user.
+
+2. Remove Public Links:
+- Thoroughly check the Header, Footer, and any public layout components. Remove ANY links, buttons, or references to "Login", "Admin", or "/admin". The public site should only navigate to recipes, categories, and legal pages.
+
+3. Secure the Admin Entry Point & Middleware:
+- The route `/admin` should be the ONLY way to access the admin login form. It must be manually typed into the URL bar.
+- Create a `middleware.ts` file in the root (or `src/` directory) to protect all routes under `/admin/*` (like `/admin/dashboard`, `/admin/recipes`, etc.) except for the login page itself.
+- If an unauthenticated user tries to access a protected dashboard URL, the middleware must redirect them to the `/admin` login page.
+- Once the admin successfully logs in, redirect them to `/admin/dashboard`.
+
+4. Admin Layout Isolation:
+- Ensure the Admin Dashboard pages use a separate, dedicated Admin Layout with a sidebar for managing recipes, categories, comments, ads, and settings. 
+- Include a "Logout" button in this layout that destroys the session/token and redirects to the public home page.
+
+5. Admin Settings Page (Change Password):
+- Create a new protected page at `/admin/settings`.
+- Build a "Change Password" form requiring three fields: Current Password, New Password, and Confirm New Password.
+- Create a secure API route to handle this submission. The route must:
+  a) Verify the user is authenticated.
+  b) Use `bcrypt.compare` to check if the "Current Password" matches the database.
+  c) If it matches, use `bcrypt.hash` to hash the "New Password".
+  d) Update the admin user's password in the database with the new hash.
+  e) Return a success message to the frontend.

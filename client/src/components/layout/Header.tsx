@@ -9,7 +9,7 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
-import { ChefHat, Search, User, Menu } from "lucide-react";
+import { ChefHat, Search, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -82,13 +82,6 @@ export default function Header() {
             <Search className="h-5 w-5" />
             <span className="sr-only">Search</span>
           </Button>
-          
-          <Link href="/admin">
-            <Button variant={location.startsWith('/admin') ? "secondary" : "ghost"} size="sm" className="hidden sm:flex gap-2">
-              <User className="h-4 w-4" />
-              <span>Admin</span>
-            </Button>
-          </Link>
           
           <Button variant="ghost" size="icon" className="md:hidden">
             <Menu className="h-6 w-6" />

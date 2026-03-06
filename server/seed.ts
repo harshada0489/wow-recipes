@@ -1,15 +1,21 @@
 import { db } from "./db";
 import { users, categories, legalPages } from "@shared/schema";
 import { eq } from "drizzle-orm";
+import bcrypt from "bcryptjs";
 
 export async function seedDatabase() {
   const [existingAdmin] = await db.select().from(users).where(eq(users.username, "admin"));
   if (!existingAdmin) {
+    const hashedPassword = await bcrypt.hash("SecureAdmin2026!", 12);
     await db.insert(users).values({
       username: "admin",
-      password: "password123",
+      password: hashedPassword,
     });
-    console.log("Seeded admin user (admin / password123)");
+    console.log("Seeded admin user (admin / SecureAdmin2026!)");
+  } else if (!existingAdmin.password.startsWith("$2")) {
+    const hashedPassword = await bcrypt.hash("SecureAdmin2026!", 12);
+    await db.update(users).set({ password: hashedPassword }).where(eq(users.id, existingAdmin.id));
+    console.log("Migrated admin password to bcrypt hash (new password: SecureAdmin2026!)");
   }
 
   const existingCategories = await db.select().from(categories);
